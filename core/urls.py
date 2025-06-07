@@ -4,7 +4,8 @@ from core import views
 
 
 urlpatterns = [
-    path('home/',views.home,name='home'),
-    path('product/int',views.home,name='home'),
+    path('',views.home,name='home'),
+    path('category/<slug:category_slug>',views.home,name='products_by_category'),
+    path('category/<slug:category_slug>/<slug:product_slug>',views.product_page,name='product_detail'),
     
 ]
