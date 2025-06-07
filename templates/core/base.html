@@ -1,50 +1,10 @@
 {% load static %}
-<script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
-        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-            try {
-                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                var firstSheetName = workbook.SheetNames[0];
-                var worksheet = workbook.Sheets[firstSheetName];
-
-                // Convert sheet to JSON to filter blank rows
-                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
-                var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
-                var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                );
-                // Fallback
-                if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
-                }
-
-                // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
-                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                return csv;
-            } catch (e) {
-                console.error(e);
-                return "";
-            }
-        }
-        return gk_fileData[filename] || "";
-        }
-        </script>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}My Store{% endblock %}</title>
+    <title>{% block title %}Home{% endblock %}</title>
     <style>
         * {
             margin: 0;
@@ -164,13 +124,23 @@
             background-color: #c82333;
         }
 
+        /* تغییرات جدید */
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        main {
+            flex: 1;
+            padding-bottom: 60px; /* فضا برای فوتر */
+        }
+
         footer {
             background-color: #333;
             color: white;
             text-align: center;
             padding: 1rem;
-            position: fixed;
-            bottom: 0;
             width: 100%;
         }
     </style>
@@ -178,7 +148,7 @@
 <body>
     <header>
         <nav class="navbar">
-            <div class="logo">My Store</div>
+            <div class="logo">Home</div>
             <div class="nav-links">
                 <a href="{% url 'home' %}">Home</a>
                 <div class="dropdown">
@@ -187,7 +157,6 @@
                         {% for category in urls %}
                         <a href="{{category.get_url}}">{{category.name}}</a>
                         {% endfor %}
-
                     </div>
                 </div>
                 <a href="#">About</a>
@@ -195,15 +164,14 @@
             </div>
             <div class="search-cart">
                 <input type="text" class="search-bar" placeholder="Search products...">
+                {% if item_count > 0 %}
                 <div class="cart">
-                    <span class="cart-logo">🛒</span>
-                    <span class="cart-count">0</span>
+                    <a href="{% url 'cart_detail' %}" class="cart-logo">🛒</a>
+                    <span class="cart-count">{{item_count}}</span>
                 </div>
-                
-                    <span class="auth-logo" title="User Profile">😊</span>
-                
-                    <span class="auth-logo" title="Sign In / Sign Up">👤</span>
-                
+                {% endif %}
+                <span class="auth-logo" title="User Profile">😊</span>
+                <span class="auth-logo" title="Sign In / Sign Up">👤</span>
                 <form action="" method="post">
                     <button type="submit" class="logout-btn">Logout</button>
                 </form>
@@ -211,11 +179,14 @@
         </nav>
     </header>
 
-    {% block content %}
-    {% endblock %}
+    <!-- اضافه کردن main -->
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
 
     <footer>
-        <p>© 2025 My Store. All rights reserved.</p>
+        <p>© 2025 arvin.ashoori. All rights reserved.</p>
     </footer>
 </body>
 </html>

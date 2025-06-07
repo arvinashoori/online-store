@@ -1,61 +1,35 @@
-<script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
-        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-            try {
-                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                var firstSheetName = workbook.SheetNames[0];
-                var worksheet = workbook.Sheets[firstSheetName];
-
-                // Convert sheet to JSON to filter blank rows
-                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
-                var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
-                var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                );
-                // Fallback
-                if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
-                }
-
-                // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
-                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                return csv;
-            } catch (e) {
-                console.error(e);
-                return "";
-            }
-        }
-        return gk_fileData[filename] || "";
-        }
-        </script>{% extends 'core/base.html' %}
+{% extends 'core/base.html' %}
 {% load static %}
-
 {% block title %}Shopping Cart - My Store{% endblock %}
-
 {% block content %}
+
 <section class="cart">
     <h1>Shopping Cart</h1>
     {% if cart_items %}
     <div class="cart-items">
-        {% for item in cart_items %}
+        {% for cart_item in cart_items %}
         <div class="cart-item">
-            <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+            <img src="{{cart_item.product.image.url}}" alt="{{ cart_item.product.name }}">
             <div class="cart-item-info">
-                <h3>{{ item.product.name }}</h3>
-                <p>Price: ${{ item.product.price }}</p>
-                <p>Quantity: {{ item.quantity }}</p>
-                <p>Subtotal: ${{ item.subtotal }}</p>
-                <form action="{% url 'remove_from_cart' item.id %}" method="post">
+                <h3>{{ cart_item.product.name }}</h3>
+                <p>Price: ${{ cart_item.product.price }}</p>
+                <!-- Added quantity control with plus/minus buttons for better UX -->
+                <div class="quantity-control">
+                    <!-- Form to decrease quantity -->
+                    <form action="{%  url 'cart_remove' cart_item.product.id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="quantity-btn" >-</button>
+                    </form>
+                    <span class="quantity">{{ cart_item.quantity }}</span>
+                    <!-- Form to increase quantity -->
+                    <form action="{%  url 'add_cart' cart_item.product.id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="quantity-btn">+</button>
+                    </form>
+                </div>
+                <p>Subtotal: ${{ cart_item.sub_total }}</p>
+                <!-- Remove button for deleting item from cart -->
+                <form action="{%  url 'cart_remove_product' cart_item.product.id %}" method="post">
                     {% csrf_token %}
                     <button type="submit" class="remove-item">Remove</button>
                 </form>
@@ -63,9 +37,10 @@
         </div>
         {% endfor %}
     </div>
+    <!-- Cart summary with total and checkout button -->
     <div class="cart-summary">
-        <h3>Total: ${{ cart_total }}</h3>
-        <a href="{% url 'checkout' %}" class="checkout-btn">Proceed to Checkout</a>
+        <h3>Total: ${{ cart_total|floatformat:2 }}</h3>
+        <a href="" class="checkout-btn">Proceed to Checkout</a>
     </div>
     {% else %}
     <p>Your cart is empty.</p>
@@ -81,29 +56,35 @@
 
 .cart h1 {
     font-size: 2rem;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
     color: #333;
 }
 
 .cart-items {
     display: grid;
-    gap: 1rem;
+    gap: 1.5rem;
 }
 
 .cart-item {
     display: flex;
     border: 1px solid #ddd;
-    border-radius: 5px;
-    padding: 1rem;
+    border-radius: 8px;
+    padding: 1.5rem;
     align-items: center;
+    background-color: #fff;
+    transition: box-shadow 0.2s;
+}
+
+.cart-item:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 .cart-item img {
-    max-width: 100px;
-    height: 100px;
+    max-width: 120px;
+    height: 120px;
     object-fit: cover;
-    border-radius: 5px;
-    margin-right: 1rem;
+    border-radius: 8px;
+    margin-right: 1.5rem;
 }
 
 .cart-item-info {
@@ -113,20 +94,59 @@
 .cart-item-info h3 {
     margin: 0.5rem 0;
     color: #333;
+    font-size: 1.25rem;
 }
 
 .cart-item-info p {
     color: #555;
     margin: 0.5rem 0;
+    font-size: 1rem;
+}
+
+.quantity-control {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 0.5rem 0;
+}
+
+.quantity-btn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.25rem;
+    line-height: 1;
+    transition: background-color 0.2s;
+}
+
+.quantity-btn:hover {
+    background-color: #0056b3;
+}
+
+.quantity-btn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.quantity {
+    font-size: 1.1rem;
+    color: #333;
+    min-width: 30px;
+    text-align: center;
 }
 
 .remove-item {
     background-color: #dc3545;
     color: white;
     border: none;
-    padding: 0.5rem 1rem;
+    padding: 0.5rem 1.25rem;
     border-radius: 5px;
     cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.2s;
 }
 
 .remove-item:hover {
@@ -134,22 +154,24 @@
 }
 
 .cart-summary {
-    margin-top: 2rem;
+    margin-top: 2.5rem;
     text-align: right;
 }
 
 .cart-summary h3 {
     color: #333;
-    margin-bottom: 1rem;
+    margin-bottom: 1.25rem;
+    font-size: 1.5rem;
 }
 
 .checkout-btn {
     background-color: #28a745;
     color: white;
-    padding: 0.75rem 1.5rem;
+    padding: 0.75rem 2rem;
     border-radius: 5px;
     text-decoration: none;
-    font-size: 1rem;
+    font-size: 1.1rem;
+    transition: background-color 0.2s;
 }
 
 .checkout-btn:hover {

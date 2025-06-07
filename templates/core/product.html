@@ -51,7 +51,13 @@
             <h1>{{product.name}}</h1>
             <p class="price">{{product.price}}</p>
             <p>{{product.description}}</p>
-            <button class="add-to-cart">Add to Cart</button>
+            {% if product.stock <= 0 %}
+			<p class="text-justify product_text"><b>Out of Stock</b></p>
+			{% else %}
+			<a href="{% url 'add_cart' product.id %}">
+			  <button type="button" name="button" class="add-to-cart">Add to Cart</button>
+            </a>
+			{% endif %}
         </div>
     </section>
 
