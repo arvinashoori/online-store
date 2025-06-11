@@ -1,21 +1,37 @@
 from django.shortcuts import render,redirect
 from .models import Category,Product,Cart,CartItem
 from django.shortcuts import get_object_or_404
+from django.db.models import Q
 
-
+#stripe imports
+import stripe
+from django.conf import settings
+from django.http import JsonResponse
 
 def home(request , category_slug = None):
     products = None
     category_page = None
-
+    
     if category_slug != None :
         category_page = get_object_or_404(Category , slug = category_slug)
         products = Product.objects.filter(category = category_page , available = True)
+   
     else :    
         products = Product.objects.all().filter(available=True)
 
 
-    return render(request,'core/home.html',{"category": category_page ,"products": products})
+    return render(request,'core/home.html',{"category": category_page ,"products": products })
+
+
+def search_products(request):
+    query = request.GET.get('q', '')   
+    if query:
+        products = Product.objects.filter(
+            Q(name__icontains=query) | Q(description__icontains=query)
+        )
+    else:
+        products = Product.objects.all()  
+    return render(request, 'core/search_results.html', {'products': products, 'query': query})
 
 
 def product_page(request , category_slug , product_slug):
@@ -93,3 +109,7 @@ def cart_remove_product(request,product_id):
     cart_item = CartItem.objects.get(product=product , cart=cart)
     cart_item.delete()
     return redirect('cart_detail')
+
+def checkout(request):
+    return render(request,'core/checkout_page.html')
+

@@ -1,0 +1,152 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Checkout - My Store{% endblock %}
+
+{% block content %}
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script>
+<section class="checkout">
+    <h1>Checkout</h1>
+    {% if cart_items %}
+    <div class="checkout-details">
+        <div class="order-summary">
+            <h2>Order Summary</h2>
+            {% for cart_item in cart_items %}
+            <div class="order-item">
+                <img src="{{ cart_item.product.image.url }}" alt="{{ cart_item.product.name }}">
+                <div class="order-item-info">
+                    <h3>{{ cart_item.product.name }}</h3>
+                    <p>Price: ${{ cart_item.product.price|floatformat:2 }}</p>
+                    <p>Quantity: {{ cart_item.quantity }}</p>
+                    <p>Subtotal: ${{ cart_item.sub_total|floatformat:2 }}</p>
+                </div>
+            </div>
+            {% endfor %}
+            <h3>Total: ${{ cart_total|floatformat:2 }}</h3>
+        </div>
+        <div class="payment-form">
+            <!-- Payment form to be implemented by you -->
+            {% block payment_form %}
+            {% endblock %}
+        </div>
+    </div>
+    {% else %}
+    <p>Your cart is empty.</p>
+    {% endif %}
+</section>
+
+<style>
+.checkout {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.checkout h1 {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    color: #333;
+}
+
+.checkout-details {
+    display: flex;
+    gap: 2rem;
+}
+
+.order-summary {
+    flex: 1;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 1.5rem;
+}
+
+.order-summary h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+.order-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 1rem;
+}
+
+.order-item img {
+    max-width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-right: 1rem;
+}
+
+.order-item-info h3 {
+    font-size: 1.25rem;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+.order-item-info p {
+    color: #555;
+    font-size: 1rem;
+    margin: 0.25rem 0;
+}
+
+.order-summary h3 {
+    text-align: right;
+    font-size: 1.5rem;
+    color: #333;
+    margin-top: 1rem;
+}
+
+.payment-form {
+    flex: 1;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 1.5rem;
+}
+</style>
+{% endblock %}

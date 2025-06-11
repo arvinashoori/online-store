@@ -128,3 +128,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR ,'static','media')
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# stripe payment
+
+STRIPE_PUBLISHABLE_KEY = 'pk_test_51RYpaIRT8heARXw8mAh8IoZmgJRWGhL4CLqi8NrOhFF0qyiy3Bg2tO1vHtvmRUKs4Yb1rT0ptCOh8bIOmjjcSNem00Dbqxj5hx'
+STRIPE_SECRET_KEY = '***REMOVED***'

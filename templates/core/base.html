@@ -79,6 +79,7 @@
             display: flex;
             align-items: center;
             gap: 1rem;
+   
         }
 
         .search-bar {
@@ -162,8 +163,12 @@
                 <a href="#">About</a>
                 <a href="#">Contact</a>
             </div>
-            <div class="search-cart">
-                <input type="text" class="search-bar" placeholder="Search products...">
+                <div class="search-cart">
+                    <form method="GET" action="{% url 'search_products' %}">
+                        <input type="text" class="search-bar" name="q" placeholder="search products...">
+                        <button type="submit">search</button>
+                    </form>
+               
                 {% if item_count > 0 %}
                 <div class="cart">
                     <a href="{% url 'cart_detail' %}" class="cart-logo">🛒</a>
