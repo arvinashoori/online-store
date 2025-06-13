@@ -51,5 +51,3 @@ def success(request):
 
 def cancel(request):
     return render(request, 'payments/cancel.html')
-def pases(request):
-    pass
