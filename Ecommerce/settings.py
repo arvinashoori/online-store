@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
+import stripe
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -38,7 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'core'
+    'core',
+    'payments',
+    'stripe',
 ]
 
 MIDDLEWARE = [
@@ -133,3 +136,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 STRIPE_PUBLISHABLE_KEY = 'pk_test_51RYpaIRT8heARXw8mAh8IoZmgJRWGhL4CLqi8NrOhFF0qyiy3Bg2tO1vHtvmRUKs4Yb1rT0ptCOh8bIOmjjcSNem00Dbqxj5hx'
 STRIPE_SECRET_KEY = '***REMOVED***'
+stripe.api_key = STRIPE_SECRET_KEY

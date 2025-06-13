@@ -2,6 +2,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Home{% endblock %}</title>
@@ -79,7 +80,6 @@
             display: flex;
             align-items: center;
             gap: 1rem;
-   
         }
 
         .search-bar {
@@ -144,6 +144,186 @@
             padding: 1rem;
             width: 100%;
         }
+
+        /* استایل‌های جدید برای فرم پرداخت */
+        .payment-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: calc(100vh - 140px); /* تنظیم ارتفاع با احتساب هدر و فوتر */
+            padding: 20px;
+        }
+
+        .payment-form {
+            width: 100%;
+            max-width: 500px;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 20px; /* فاصله از بالا */
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 1rem;
+            color: #333;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .form-textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        .receipt {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-left: 4px solid #28a745;
+            border-radius: 5px;
+        }
+
+        .receipt-title {
+            font-size: 1.2rem;
+            color: #28a745;
+            margin-bottom: 10px;
+        }
+
+        .receipt-item {
+            font-size: 1rem;
+            color: #555;
+            margin: 5px 0;
+        }
+
+        .payment-button {
+            width: 100%;
+            padding: 12px;
+            font-size: 1.1rem;
+        }
+
+        .error-message {
+            text-align: center;
+            margin-top: 10px;
+        }
+         /* استایل‌های جدید برای فرم پرداخت */
+        .payment-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: calc(100vh - 140px); /* تنظیم ارتفاع با احتساب هدر و فوتر */
+            padding: 20px;
+        }
+
+        .payment-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .payment-title {
+            font-size: 2rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .payment-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .form-group {
+            text-align: left;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 1.1rem;
+            color: #34495e;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ecf0f1;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-input:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+
+        .form-textarea {
+            height: 120px;
+            resize: vertical;
+        }
+
+        .receipt {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #ffffff;
+            border-left: 5px solid #2ecc71;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .receipt-title {
+            font-size: 1.3rem;
+            color: #2ecc71;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .receipt-item {
+            font-size: 1.1rem;
+            color: #7f8c8d;
+            margin: 5px 0;
+        }
+
+        .payment-button {
+            width: 100%;
+            padding: 12px;
+            font-size: 1.2rem;
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .payment-button:hover {
+            background-color: #c0392b;
+        }
+
+        .error-message {
+            text-align: center;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -163,12 +343,11 @@
                 <a href="#">About</a>
                 <a href="#">Contact</a>
             </div>
-                <div class="search-cart">
-                    <form method="GET" action="{% url 'search_products' %}">
-                        <input type="text" class="search-bar" name="q" placeholder="search products...">
-                        <button type="submit">search</button>
-                    </form>
-               
+            <div class="search-cart">
+                <form method="GET" action="{% url 'search_products' %}">
+                    <input type="text" class="search-bar" name="q" placeholder="search products...">
+                    <button type="submit">search</button>
+                </form>
                 {% if item_count > 0 %}
                 <div class="cart">
                     <a href="{% url 'cart_detail' %}" class="cart-logo">🛒</a>
@@ -184,7 +363,6 @@
         </nav>
     </header>
 
-    <!-- اضافه کردن main -->
     <main>
         {% block content %}
         {% endblock %}

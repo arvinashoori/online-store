@@ -40,7 +40,7 @@
     <!-- Cart summary with total and checkout button -->
     <div class="cart-summary">
         <h3>Total: ${{ cart_total|floatformat:2 }}</h3>
-        <a href="{% url 'checkout'%}" class="checkout-btn">Proceed to Checkout</a>
+        <a href="{% url 'checkout' %}" class="checkout-btn">Proceed to Checkout</a>
     </div>
     {% else %}
     <p>Your cart is empty.</p>

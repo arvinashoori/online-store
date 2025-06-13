@@ -3,10 +3,8 @@ from .models import Category,Product,Cart,CartItem
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 
-#stripe imports
-import stripe
 from django.conf import settings
-from django.http import JsonResponse
+
 
 def home(request , category_slug = None):
     products = None
@@ -111,5 +109,20 @@ def cart_remove_product(request,product_id):
     return redirect('cart_detail')
 
 def checkout(request):
-    return render(request,'core/checkout_page.html')
+    try:
+        cart = Cart.objects.get(cart_id=_cart_id(request))
+        cart_items = CartItem.objects.filter(cart=cart, active=True)
+        total = sum(item.product.price * item.quantity for item in cart_items)
+        counter = sum(item.quantity for item in cart_items)
+    except Cart.DoesNotExist:
+        cart_items = []
+        total = 0
+        counter = 0
+    return render(request, 'payments/checkout.html', {
+        'cart_items': cart_items,
+        'total': total,
+        'counter': counter,
+        'stripe_publishable_key': settings.STRIPE_PUBLISHABLE_KEY
+    })
+
 
