@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
+from dotenv import load_dotenv
 import stripe
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -133,7 +134,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR ,'static','media')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # stripe payment
-
-STRIPE_PUBLISHABLE_KEY = 'pk_test_51RYpaIRT8heARXw8mAh8IoZmgJRWGhL4CLqi8NrOhFF0qyiy3Bg2tO1vHtvmRUKs4Yb1rT0ptCOh8bIOmjjcSNem00Dbqxj5hx'
-STRIPE_SECRET_KEY = '***REMOVED***'
+load_dotenv()
+STRIPE_PUBLISHABLE_KEY = os.getenv('STRIPE_PUBLISHABLE_KEY')
+STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
 stripe.api_key = STRIPE_SECRET_KEY
+
