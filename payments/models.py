@@ -1,21 +1,21 @@
 from django.db import models 
-from core.models import Product
-from django.contrib.auth.models import User
+from core.models import Cart, CartItem ,Product
+from accounts.models import User
 
-class Order(models.Model):
+class Order(models.Model): 
+    STATUS_CHOICESS = (('pending', 'Pending'),
+                        ('processing', 'Processing'),
+                          ('shipped', 'Shipped'),
+                            ('delivered', 'Delivered'),
+                              ('cancelled', 'Cancelled'),)
+    
 
-    STATUS_CHOICES = (('pending', 'Pending'),
-                      ('processing', 'Processing'),
-                      ('shipped', 'Shipped'),
-                      ('delivered', 'Delivered'),
-                      ('cancelled', 'Cancelled'),)
-    phone_number = models.IntegerField(null=True, blank=True)
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True) 
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='orders') 
     order_number = models.CharField(max_length=20, unique=True) 
     email = models.EmailField(max_length=100) 
     address = models.TextField() 
     created_at = models.DateTimeField(auto_now_add=True) 
-    status = models.CharField(max_length=20,choices=STATUS_CHOICES,default='pending') 
+    status = models.CharField(max_length=20, choices = STATUS_CHOICESS, default='pending') 
     total = models.DecimalField(max_digits=10, decimal_places=2)
 
     class Meta:
@@ -36,7 +36,6 @@ class OrderItem(models.Model):
         return f"{self.product.name} (x{self.quantity})"
 
 class Payment(models.Model): 
-
     order = models.OneToOneField(Order, on_delete=models.CASCADE) 
     stripe_payment_id = models.CharField(max_length=100) 
     amount = models.DecimalField(max_digits=10, decimal_places=2) 

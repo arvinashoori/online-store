@@ -6,10 +6,12 @@ from core.models import Cart, CartItem ,Product
 from .models import Order, OrderItem, Payment 
 import uuid
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required,permission_required
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
+@login_required
 @csrf_exempt
 def create_checkout_session(request): 
     try: 

@@ -1,6 +1,7 @@
 from django.contrib import admin 
 from .models import Order, OrderItem, Payment
 
+
 class OrderItemInline(admin.TabularInline): 
     model = OrderItem 
     extra = 0 
@@ -8,13 +9,11 @@ class OrderItemInline(admin.TabularInline):
     can_delete = False
 
 class OrderAdmin(admin.ModelAdmin): 
-    list_display = ['user', 'email', 'phone_number','address', 'created_at','status','total']
-    list_filter = ['user', 'email','created_at','status', 'phone_number']
-    search_fields = ['user','phone','first_name', 'phone_number']
+    list_display = ('order_number', 'user', 'email', 'total', 'status', 'created_at') 
+    list_filter = ('status', 'created_at') 
+    search_fields = ('order_number', 'email', 'user__username') 
     fieldsets = (
-        (None, {
-            'fields': ('phone_number',)
-        }),
+
         ('Personal info', {
             'fields': ('email', 'address', 'user'),
             'classes': ('wide',)
@@ -24,7 +23,7 @@ class OrderAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
     )
-    readonly_fields = ('created_at','user','email','address','phone_number') 
+    readonly_fields = ('created_at','user','email','address') 
     inlines = [OrderItemInline]
 
 class PaymentAdmin(admin.ModelAdmin): 

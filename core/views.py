@@ -2,7 +2,7 @@ from django.shortcuts import render,redirect
 from .models import Category,Product,Cart,CartItem
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
-
+from django.contrib.auth.decorators import login_required,permission_required
 from django.conf import settings
 
 
@@ -108,6 +108,7 @@ def cart_remove_product(request,product_id):
     cart_item.delete()
     return redirect('cart_detail')
 
+@login_required
 def checkout(request):
     try:
         cart = Cart.objects.get(cart_id=_cart_id(request))

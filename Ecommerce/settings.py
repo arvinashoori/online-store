@@ -30,6 +30,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+AUTH_USER_MODEL = 'accounts.User'
+LOGIN_URL = '/accounts/signin/'
 
 # Application definition
 
@@ -40,9 +42,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
     'core',
     'payments',
     'stripe',
+    'accounts',
 ]
 
 MIDDLEWARE = [

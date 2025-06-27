@@ -354,11 +354,19 @@
                     <span class="cart-count">{{item_count}}</span>
                 </div>
                 {% endif %}
-                <span class="auth-logo" title="User Profile">😊</span>
-                <span class="auth-logo" title="Sign In / Sign Up">👤</span>
-                <form action="" method="post">
+                {% if request.user.is_authenticated %}        
+                <a href="" class="auth-logo" title="User Profile">
+                    <span>😊</span>
+                </a>
+                <form action="{% url 'signout' %}" method="post">
                     <button type="submit" class="logout-btn">Logout</button>
                 </form>
+                {% else %}
+                <a href="{% url 'signin' %}" class="auth-logo" title="Sign In / Sign Up">
+                    <span>👤</span>
+                </a>
+                
+                {% endif %}
             </div>
         </nav>
     </header>
