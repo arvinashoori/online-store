@@ -135,4 +135,4 @@ Access the application at `http://127.0.0.1:8000`.
 ## Contact
 - **GitHub**: [arvinashoori](https://github.com/arvinashoori)
 - **Email**: [arvin.ashoori@gmail.com]
-- **Tg**: [@arvinashoori]
+- **Tg**: [arvinashoori]
