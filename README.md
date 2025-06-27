@@ -134,4 +134,5 @@ Access the application at `http://127.0.0.1:8000`.
 
 ## Contact
 - **GitHub**: [arvinashoori](https://github.com/arvinashoori)
-- **Email**: [your_email@example.com](mailto:your_email@example.com)
+- **Email**: [arvin.ashoori@gmail.com]
+- **Tg**: [@arvinashoori]
